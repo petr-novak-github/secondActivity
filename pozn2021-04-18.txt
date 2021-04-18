@@ -1,0 +1,332 @@
+2021-04-16
+
+1511
+v projektu v properties
+target version
+a minimal version
+
+1531
+create new project
+Android Xamarin App
+WeatherAppTest - pojmenovat
+Blank App
+
+video 0845
+
+2021-04-17
+
+0913
+video0845
+
+aplikace bude stahovat pocasi
+
+slozka resources - layout - activity_main.xml
+v korenu projektu MainActivit
+
+smazal tohle
+ Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+a tohle
+public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        {
+            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+AppCompatActivity
+- dedi z ni trida MainActivity
+- odkazuje na knihovnu Xamarin.Google.Android.Material - v references
+
+0849 video
+CSharpovske bindingy
+0852
+SetContentView
+- urcuje ktera aktivita ma v sobe jaky layout
+- chce intiger, chce id nejakoho layoutu
+- my tam sice sahame na soubor, ale ve skutecnosti ma androi ulozene layouty v resource designeru
+v slozce Resources - values - Resource.designer.cs
+- pry nesahat do toho
+- pri bildu si tam vytvari xamarin idecko layoutu ... cislo treba desetimistne .. nevim proc .. ") ale nesahat do toho
+
+budeme mezi sebou volat aktivity, jedna bude spoustet druhou ..
+video 0902
+ve vetsine pripadu se ty aktivity prekryvaji, pokud vylozene nezavolam, ze chci danou aktivitu zabit
+je to jak kdyz na sebe davate karty a tu vrchni odbirate odbirate ..
+
+video0903
+hodne aplikaci je maloaktivitovych,
+jen rozsahlejsi aplikace vyvuzivaji vic aktivit
+
+nase aplikace bude mit 3 aktivity
+
+pridame si novou aktivitu ... pravym na prijekt ... add .. new item .. vyberu activity
+to je proste trida, ktera uz ma v sobe naky preddefinovany kod, ktery ma aktivita
+- no nejen trida, asi si to k sobe vytvari i dalsi veci .. treba layout.xml
+
+pojmenujem SecondActiivty , nechame dedit z Activity , zmenime label na "SecondActivity"
+no a v tom activity_second.xml
+upravuje layaut
+
+do LinearLayout da TextView
+a v nem je 
+android:text="Second Activity"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+
+pry v linear layoutu se centruje spatne
+tak ho zmenil na relative layout
+
+jsou dve cesty jak psat layout
+napisu android a naseptavac nabide co muzu psat
+nebo v pravo dole lze vybirat z moznosti ...
+
+to TextView je neparovy tag a to android:text="Second Activity" android:layout_width="match_parent" jsou atributy toho tagu
+pridal atribut android: layout_centerInParent="true" a horizonatalne se text vycentroval
+
+pridava android:textSize="16dp"
+jednoty jsou i sp ..
+
+prvek v layout musi mit sve id abychom s nim pak mohli pracovat
+u nas prvek TextView
+pridam do TextView atribut android:id="@+id/textViewLabel"
+to @+id/ je nejaka androidni konvence a to zatim nami vymysleny string 
+
+ted to budeme muset zbuildnout aby se to propsalo do toho resource designeru ... asi aby se tam vytvoril ten int id v tom ResourceDesigner.cs
+k te aktivite second .. nevim .
+jo tak to je potiz toho xamarinu nebo androidu .. ze se to musi obcas zbuildovat
+aby videl tu aktivitu
+
+v takovych pripadech se da pravym na projekt a Clean
+a pak pravym na projekt a rebuild
+a Resource.designer.cs by se mel zpamatovat a propsat tam to idecko toho prvku
+takze v Resource.designer.cs je i ten prvek TextView a jeho idecko, activity_main.xml a activity_second.xml coz jsou 
+layouty
+
+video 9:14 jdu na obed
+1420
+0920
+xamarin forms maji jit v listopadu s nastupem dot net 6 do duchodu
+ma prijit nake mauvi
+prebindovani androidu do c#
+mnobilni facebook neni napsana v react native ale v jave, resp androidu
+
+video0953
+apikace spousti jako prvni aktivitu, ktera ma  v te anotaci [] MainLauncher = true
+
+clean a rebuil pomaha
+
+v kazde aktivite musim mi v metode OnCreate metodu 
+SetContentView(Resource.Layout.activity_second)
+
+0956
+kdyz vytvoril tendruhy layout tak mu tam chybi MSBuild:UpdateGeneratedFiles
+
+vstupni bod do aplikace v anotaci [] MainLauncher = true
+video 0959
+do activity_main.xml
+pridal buton
+zase neparovy tag
+s atributy
+android:id="@+id/MyButton"
+android:text="my button"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+
+1457
+ted v MainActivity.cs
+chci si vytahnout ten buton, tak se pouziva genericka metoda
+FindViewById<Button>(Resource.Id.myButton)
+
+genericka metoda
+- aby se nemusela psat metoda pro kazdy prvek zvlast, pro Button, TextView ..
+tak se udela jedna genericka metoda a ve spicatych zavorkach se ji urci typ
+
+1002
+kazdy prvek Button, TextView dedi z predka View
+existuje i negenericka metoda
+FindViewById(Resource.Id.myButton)
+a dam si var button = FindViewById(Resource.Id.myButton)
+- tak mi to vrati typ View, ale ja kdyz budu chtit pracovat se 
+specifickou property jen pro Button treba Click, tak samotne View to nemusi mit
+proto to musi jeste pretypovat na Button
+var button = (Button)FindViewById(Resource.Id.myButton)
+
+1510
+v1006
+rika ze zkousel i Android studio, kde se vyviji nativne a ze tam ty problemy nejsou tolik
+
+ulozit a rebuild a vetsinou vyresi problem
+button.Text = "Text changed from activity";
+v1010
+button.Click += a tabulator
+a automaticky to vygeneruje event handler
+
+button.Click += Button_Click;
+
+private void Button_Click(object sender, System.EventArgs e)
+{
+throw new System.NotImplementedException();
+}
+v1011
+takze 
+button.Click += Button_Click;
+priradi na click metodu Button_Click
+takze kdyz kliknu tak se spusti metoda Button_Click, ktera ma dva argumenty
+z toho jeden je object sender, a tan sender je ten ktery tu metodu vyvolal, takze button
+1012
+button.Click += Button_Click;
+- prirazuju delegata
+
+1013
+inline zapis s anonymni metodou
+button.Click += (s,e) => { ...};
+je to to same jak s tou metodou
+
+v1017
+
+mame prvky TextView, Button,
+dasli je Toast
+- takova ta spravicka na chvilku, takovy popisek co se deje
+v1018
+- asi chce po kliku zobrazit Toast
+
+tak do te medody Button_Click
+da 
+Toast.MakeText(this, "button clicked", ToastLength.Short).Show();
+to this asi znamena v teto aktivite
+v1021
+- pocad si to zkusim udelat ve visual studiu
+proste mi najede obrazovka s buttonem a po kliku se mi zobrazi toast
+
+1629 real
+mel tam jeste naimportovane
+using Android.Widget;
+
+1634
+nemam git do pici
+
+2021-04-18
+plan
+
+git install
+xamarin dodelat weather app
+kdyz me to bude srat tak udemy web dev
+
+1111
+- git uz funguje snad i s tokkenem
+- prosel jsem si i pull request, conflict, merge, branche z udemy
+
+r1210
+v1021
+
+cistota kodu
+
+SetupReferences
+- jeho metoda pro cistsi kod
+
+do OnCreate
+dal 
+SetupReferences();
+- nazvem se snazi popsat co bude metoda delat
+a pak vytvori metodu venku z OnCreate
+
+public void SetupReferences {
+
+
+};
+
+posle tam button a vraci to Button
+
+Button button1 = SetupReferences(button);
+- dam ctrl + tecka - generate method
+tak mi to vygeneruje metodu ktera vraci typ Button a ma parametr typ Button
+
+v1026
+prvky si vytahneme v OnCreate metode
+
+private fieldy maji podrzitko
+_button
+takze v OnCreate metode budu mit jen metodu SetupReferences();
+tu si automaticky necham vygenerovat ven z metody
+a v ni vytvorim _button a pravym na to kliknu a dam vytvorit z toho private filda
+1028
+v OnCreate
+musi byt prvni base. .. magic 
+pak SetContentView ... tim narubu layout
+pak treba tu SetupReferences
+v ktere si vytahuju prvky z layoutu a rikam jim co budou delat
+pak si vytvorim treba
+SubscribeEvenHandlers();
+zas ctrl plus tecka generovat metodu a do ni presumu
+_button.Click += Button_Click;
+1029
+FindViewById hodim do SetupReferences .. tam vytahuju ty prvky z layoutu
+
+ale v ruznych jinych firmach budou guide na kod kvality
+1030
+misto toastu spousti druhou aktivitu
+
+do metody Button_Click
+si vytvoril metodu
+StartSecondActivity();
+z te si ctrl plus tecka vygeneroval metodu
+
+private void StartSecond(){};
+
+u nich ve firme traduje takova poucka, kdyz to ma vice nez dva radky kodu tak by se na to mela udelat metoda
+1030
+1033
+intent
+aktivita nevala jdna druhou
+ale vytvori se intent a v tom intentu vyspecifikuju co chci delat, ze chci spustit aktivitu2
+takze my intent posleme do AndroidOS, ten to prechrosta, provede naky magic a spusti Activitu2
+intent - zamer
+1034
+intentem se daji spustit i cizi aplikace
+treba link v aplikaci, na ktery kdyz kliknem tak spusti prohlizec, a zepta se v jakem prohlizeci to chci spustit
+a prohlizec je jen dalsi aplikace, dalsi aktivita
+intentem si muzeme sahnout pro fotky do telefonu
+a fotky muzou mit vice manageru
+intent je takovy univerzalni nastroj, ze s nim muzeme sahat i do cizich aplikaci
+1036
+takze do metody StartSecondActivity
+si vytvorime intent
+var intent = new Intent(this, typeof(SecondActivity));
+- ten parametr SecondActivity bude asi nazev tridy te druhe aktivity
+StartActivity(intent);
+- ta metoda StartActivity s parametrem intent je asi preddefinovana z nake knihovny
+
+v1038
+r1345
+udelam si android aplikaci, ktera po stisku tlacitka spusti druhou aktivitu
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
